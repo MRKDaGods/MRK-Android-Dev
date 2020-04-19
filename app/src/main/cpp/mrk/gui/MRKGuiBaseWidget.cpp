@@ -8,6 +8,8 @@ namespace MRK
 {
     namespace GUI
     {
+        static int ms_GlobalIDs = -1;
+
         MRKGuiBaseWidget::MRKGuiBaseWidget(MRKGuiBaseWidget *parent, MRKAnchor anchor, _MATH Rect rect, MRKWidgetInitFlags flags) : m_Size(_MATH Vector2::Zero),
                                                                        m_FixedSize(_MATH Vector2::Zero),
                                                                        m_Position(_MATH Vector2::Zero),

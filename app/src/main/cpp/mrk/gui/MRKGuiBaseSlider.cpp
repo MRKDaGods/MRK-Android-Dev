@@ -2,27 +2,22 @@
 
 #include "MRKGuiBaseSlider.h"
 
-namespace MRK
-{
-    namespace GUI
-    {
+namespace MRK {
+    namespace GUI {
 
         MRKGuiBaseSlider::MRKGuiBaseSlider(MRKGuiBaseWidget *parent, MRKAnchor anchor,
                                            _MATH Rect rect, float min, float max)
                 : MRKGuiBaseWidget(parent, anchor, rect),
                   m_Range(0.f, 1.f),
-                  m_HighlightedRange(0.f, 0.f), m_RealRange(0.f, 1.f)
-        {
+                  m_HighlightedRange(0.f, 0.f), m_RealRange(0.f, 1.f) {
             m_HighlightColor = MRKColor(255, 80, 80, 70);
         }
 
-        float MRKGuiBaseSlider::Value()
-        {
+        float MRKGuiBaseSlider::Value() {
             return m_Value * (m_RealRange.second - m_RealRange.first) + m_RealRange.first;
         }
 
-        void MRKGuiBaseSlider::Draw(MRKUIcontext *context)
-        {
+        void MRKGuiBaseSlider::Draw(MRKUIcontext *context) {
             _MATH Vector2 center = Position() + m_Size * 0.5f;
             float kr = (int) (m_Size.Y() * 0.4f), kshadow = 3;
             float startX = kr + kshadow + Position().X();
@@ -42,39 +37,38 @@ namespace MRK
             MRKUIFillPaint(context, bg);
             MRKUIFill(context);
 
-            if (m_HighlightedRange.second != m_HighlightedRange.first)
-            {
+            if (m_HighlightedRange.second != m_HighlightedRange.first) {
                 MRKUIBeginPath(context);
                 MRKUIRoundedRect(context, startX + m_HighlightedRange.first * m_Size.X(),
-                               center.Y() - kshadow + 1,
-                               widthX *
-                               (m_HighlightedRange.second - m_HighlightedRange.first),
-                               kshadow * 2, 2);
+                                 center.Y() - kshadow + 1,
+                                 widthX *
+                                 (m_HighlightedRange.second - m_HighlightedRange.first),
+                                 kshadow * 2, 2);
                 MRKUIFillColor(context, &m_HighlightColor);
                 MRKUIFill(context);
             }
 
             MRKUIpaint knobShadow =
                     MRKUIRadialGradient(context, knobPos.X(), knobPos.Y(), kr - kshadow,
-                                      kr + kshadow, &MRKColor(0, 64), &m_Theme->Transparent);
+                                        kr + kshadow, &MRKColor(0, 64), &m_Theme->Transparent);
 
             MRKUIBeginPath(context);
             MRKUIRect(context, knobPos.X() - kr - 5, knobPos.Y() - kr - 5, kr * 2 + 10,
-                    kr * 2 + 10 + kshadow);
+                      kr * 2 + 10 + kshadow);
             MRKUICircle(context, knobPos.X(), knobPos.Y(), kr);
             MRKUIPathWinding(context, MRKUI_HOLE);
             MRKUIFillPaint(context, knobShadow);
             MRKUIFill(context);
 
             MRKUIpaint knob = MRKUILinearGradient(context,
-                                              Position().X(), center.Y() - kr, Position().X(),
-                                              center.Y() + kr,
-                                              &m_Theme->BorderLight, &m_Theme->BorderMedium);
+                                                  Position().X(), center.Y() - kr, Position().X(),
+                                                  center.Y() + kr,
+                                                  &m_Theme->BorderLight, &m_Theme->BorderMedium);
             MRKUIpaint knobReverse = MRKUILinearGradient(context,
-                                                     Position().X(), center.Y() - kr,
-                                                     Position().X(), center.Y() + kr,
-                                                     &m_Theme->BorderMedium,
-                                                     &m_Theme->BorderLight);
+                                                         Position().X(), center.Y() - kr,
+                                                         Position().X(), center.Y() + kr,
+                                                         &m_Theme->BorderMedium,
+                                                         &m_Theme->BorderLight);
 
             MRKUIBeginPath(context);
             MRKUICircle(context, knobPos.X(), knobPos.Y(), kr);
@@ -90,8 +84,7 @@ namespace MRK
             MRKUIFill(context);
         }
 
-        bool MRKGuiBaseSlider::HandleTouchEvent(MRKTouchEvent &event)
-        {
+        bool MRKGuiBaseSlider::HandleTouchEvent(MRKTouchEvent &event) {
             if (!m_Interactable)
                 return true;
 
@@ -108,23 +101,19 @@ namespace MRK
             return true;
         }
 
-        void MRKGuiBaseSlider::SetCallback(_STD function<void(float)> callback)
-        {
+        void MRKGuiBaseSlider::SetCallback(_STD function<void(float)> callback) {
             m_OnValueChangedCallback = callback;
         }
 
-        void MRKGuiBaseSlider::SetLiveCallback(_STD function<void(float)> callback)
-        {
+        void MRKGuiBaseSlider::SetLiveCallback(_STD function<void(float)> callback) {
             m_OnLiveValueChangedCallback = callback;
         }
 
-        int MRKGuiBaseSlider::Id()
-        {
+        int MRKGuiBaseSlider::Id() {
             return 2;
         }
 
-        void MRKGuiBaseSlider::SetRange(float min, float max)
-        {
+        void MRKGuiBaseSlider::SetRange(float min, float max) {
             m_RealRange = _STD make_pair(min, max);
         }
     }

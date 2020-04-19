@@ -55,7 +55,9 @@ namespace MRK {
             int ID;
 
             MRKGUIDisplay();
-            MRKGUILabel* RegisterWidget(MRKGUILabel* widget);
+
+            MRKGUILabel *RegisterWidget(MRKAnchor anchor, Rect rect, const char *txt,
+                                        float fontsize = 0, MRKGUIWidget *parent = this);
         };
 
         struct MRKGUILabel : public MRKGUIWidget {

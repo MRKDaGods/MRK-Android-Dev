@@ -5,38 +5,133 @@
 
 namespace MRK {
     namespace GUI {
-        JNIEXPORT int JNICALL MRKProxyRegisterGUICallback(MRKProxyGUICallback callback) {
-            return MRKApplication::RegisterProxyGUI(callback);
-        }
+        bool JNICALL MRKProxyProcessCommand(MRKProxyCommand command, ...) {
+            va_list args;
 
-        JNIEXPORT void JNICALL MRKProxySetColor(float r, float g, float b, float a) {
-            MRKGUI::SetColor(MRKColor(r, g, b, a));
-        }
+            switch (command) {
 
-        JNIEXPORT void JNICALL
-        MRKProxyLabel(float x, float y, float w, float h, const char *txt, float fontsize) {
-            MRKGUI::Label(_MATH Rect(x, y, w, h), txt, fontsize);
-        }
+                case MRKProxyCommand::RegisterGUICallback: { //(int*, MRKProxyGUICallback)
+                    va_start(args, 2);
+                    int *_idptr = va_arg(args, int*);
+                    if (_idptr)
+                        *_idptr = MRKApplication::RegisterProxyGUI(
+                                va_arg(args, MRKProxyGUICallback));
+                }
+                    break;
 
-        JNIEXPORT void JNICALL MRKProxyBox(float x, float y, float w, float h) {
-            MRKGUI::Box(_MATH Rect(x, y, w, h));
-        }
+                case MRKProxyCommand::SetColor: {
+                    va_start(args, 4);
+                    MRKGUI::SetColor(MRKColor(va_arg(args, float), va_arg(args, float),
+                                              va_arg(args, float), va_arg(args, float)));
+                }
+                    break;
 
-        JNIEXPORT void JNICALL MRKProxyLine(float x1, float y1, float x2, float y2, float width) {
-            MRKGUI::Line(_MATH Vector2(x1, y1), _MATH Vector2(x2, y2), width);
-        }
+                case MRKProxyCommand::Label: {
+                    va_start(args, 6);
+                    MRKGUI::Label(_MATH Rect(va_arg(args, float), va_arg(args, float),
+                                             va_arg(args, float), va_arg(args, float)),
+                                  va_arg(args, const char*),
+                                  va_arg(args, float));
+                }
+                    break;
 
-        JNIEXPORT void JNICALL MRKProxyGetScreenInfo(float *w, float *h, float *pr) {
-            DisplayInfo *info = MRKApplication::GetUIDisplayInfo();
+                case MRKProxyCommand::Box: {
+                    va_start(args, 4);
+                    MRKGUI::Box(_MATH Rect(va_arg(args, float), va_arg(args, float),
+                                           va_arg(args, float), va_arg(args, float)));
+                }
+                    break;
 
-            if (w)
-                *w = info->Width;
+                case MRKProxyCommand::Line: {
+                    va_start(args, 5);
+                    MRKGUI::Line(_MATH Vector2(va_arg(args, float), va_arg(args, float)),
+                                 _MATH Vector2(va_arg(args, float), va_arg(args, float)),
+                                 va_arg(args, float));
+                }
+                    break;
 
-            if (h)
-                *h = info->Height;
+                case MRKProxyCommand::GetScreenInfo: {
+                    va_start(args, 3);
+                    DisplayInfo *info = MRKApplication::GetUIDisplayInfo();
 
-            if (pr)
-                *pr = info->PixelRatio;
+                    float *w = va_arg(args, float*);
+                    if (w)
+                        *w = info->Width;
+
+                    float *h = va_arg(args, float*);
+                    if (h)
+                        *h = info->Height;
+
+                    float *pr = va_arg(args, float*);
+                    if (pr)
+                        *pr = info->PixelRatio;
+                }
+                    break;
+
+                case MRKProxyCommand::GetMainDisplay: { //(void**, int*)
+                    va_start(args, 2);
+                    _GUI MRKDisplay *display = MRKApplication::GetUIDisplay();
+
+                    void **_dptr = va_arg(args, void**);
+                    if (_dptr)
+                        *_dptr = display;
+
+                    int *_idptr = va_arg(args, int*);
+                    if (_idptr)
+                        *_idptr = display->DisplayId();
+                }
+                    break;
+
+                case MRKProxyCommand::RegisterLabel: {
+                    va_start(args, 6);
+                    void *parent = va_arg(args, void*);
+                    MRKAnchor anchor = va_arg(args, MRKAnchor);
+                    _MATH Rect rect = va_arg(args, _MATH
+                            Rect);
+                    const char *txt = va_arg(args, const char*);
+                    float fontsize = va_arg(args, float);
+                    void **handle = va_arg(args, void**);
+
+                    if (handle) {
+                        //no handle, no shit
+                        *handle = new MRKGuiBaseLabel((MRKGuiBaseWidget *) parent, anchor, rect,
+                                                      txt,
+                                                      fontsize);
+                    }
+                }
+                    break;
+
+                case MRKProxyCommand::LabelGetText: {
+                    va_start(args, 2);
+                    void *handle = va_arg(args, void*);
+                    char **cptr = va_arg(args, char**);
+
+                    if (handle && cptr) {
+                        _STD string txt = ((MRKGuiBaseLabel *) handle)->GetText();
+                        *cptr = new char[txt.size() + 1];
+                        strcpy(*cptr, txt.c_str());
+                        //TODO: potential memory leak, store old ptrs somewhere and delete when recall
+                    }
+                }
+                    break;
+
+                case MRKProxyCommand::LabelSetText: {
+                    va_start(args, 2);
+                    void *handle = va_arg(args, void*);
+                    const char *txt = va_arg(args, const char*);
+
+                    if (handle)
+                        ((MRKGuiBaseLabel *) handle)->SetText(txt);
+                }
+                    break;
+
+                default:
+                    return false;
+
+            }
+
+            va_end(args);
+            return true;
         }
     }
 }

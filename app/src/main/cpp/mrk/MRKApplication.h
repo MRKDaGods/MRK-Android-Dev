@@ -47,5 +47,7 @@ namespace MRK
         static FramerateInfo *GetUpdateFramerateInfo();
         static float GetTimeSinceLaunch();
         static int RegisterProxyGUI(void(*callback)());
+
+        static _GUI MRKDisplay *GetUIDisplay();
     };
 }

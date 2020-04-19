@@ -4,12 +4,9 @@
 
 #include "MRKGuiBaseWidget.h"
 
-namespace MRK
-{
-    namespace GUI
-    {
-        class MRKGuiBaseSlider : public MRKGuiBaseWidget
-        {
+namespace MRK {
+    namespace GUI {
+        class MRKGuiBaseSlider : public MRKGuiBaseWidget {
         private:
             _STD pair<float, float> m_Range;
             _STD pair<float, float> m_HighlightedRange;
@@ -19,14 +16,22 @@ namespace MRK
             _STD function<void(float)> m_OnValueChangedCallback;
             _STD function<void(float)> m_OnLiveValueChangedCallback;
         public:
-            MRKGuiBaseSlider(MRKGuiBaseWidget *parent, MRKAnchor anchor, _MATH Rect rect, float min = -1,
+            MRKGuiBaseSlider(MRKGuiBaseWidget *parent, MRKAnchor anchor, _MATH Rect rect,
+                             float min = -1,
                              float max = -1);
+
             float Value();
+
             void Draw(MRKUIcontext *context) override;
+
             bool HandleTouchEvent(MRKTouchEvent &event) override;
+
             void SetCallback(_STD function<void(float)> callback);
+
             void SetLiveCallback(_STD function<void(float)> callback);
+
             void SetRange(float min, float max);
+
             virtual int Id() override;
         };
     }

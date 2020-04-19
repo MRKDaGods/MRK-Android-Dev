@@ -75,6 +75,8 @@ add_library( # Sets the name of the library.
              mrk/components/MRKGuiComponentDebugger.cpp
              mrk/components/MRKGuiComponentLoader.cpp
 
+        mrk/components/DT2/MRKGuiComponentBaseDT2_REF.cpp
+
              mrk/utils/MRKUtils.cpp
 
              mrk/math/MRKMath.cpp

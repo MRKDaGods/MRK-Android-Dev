@@ -5,29 +5,28 @@
 
 #include <dlfcn.h>
 
+//TODO: add safety mechanism to MRKProxy... calls
+
 namespace MRK {
-    typedef int (*__MRKProxyRegisterGUICallback)(GUI::MRKProxyGUICallback);
+    enum class MRKProxyCommand {
+        None = 0,
 
-    typedef void (*__MRKProxySetColor)(float, float, float, float);
+        //UI-SPECIFIC
+                RegisterGUICallback, //registers a gui callback
+        SetColor, //sets color in MRKGUI
+        Label, //renders a generic label
+        Box, //renders a generic box
+        Line, //renders a line
+        GetScreenInfo, //retrieve screen info
 
-    typedef void (*__MRKProxyLabel)(float, float, float, float, const char *, float);
+        //MGUI
+                GetMainDisplay,
+        RegisterLabel,
+        LabelGetText,
+        LabelSetText
+    };
 
-    typedef void (*__MRKProxyBox)(float, float, float, float);
-
-    typedef void (*__MRKProxyLine)(float, float, float, float, float);
-
-    typedef void (*__MRKProxyGetScreenInfo)(float *, float *, float *);
-
-    typedef void (*__MRKGUIGetMainDisplay)(void**, int*); //handle, id
-    typedef void (*__MRKGUIDisplayRegisterWidget)();
-
-    __MRKProxyRegisterGUICallback _MRKProxyRegisterGUICallback;
-    __MRKProxySetColor _MRKProxySetColor;
-    __MRKProxyLabel _MRKProxyLabel;
-    __MRKProxyBox _MRKProxyBox;
-    __MRKProxyLine _MRKProxyLine;
-    __MRKProxyGetScreenInfo _MRKProxyGetScreenInfo;
-    __MRKGUIGetMainDisplay _MRKGUIGetMainDisplay;
+    bool (*MRKProxyProcessCommand)(MRKProxyCommand cmd, ...);
 
     bool MRKProxyInitialize(const char *pkg) {
 
@@ -35,14 +34,8 @@ namespace MRK {
         if (!mrk)
             return false;
 
-        _MRKProxyRegisterGUICallback = (__MRKProxyRegisterGUICallback) dlsym(mrk,
-                                                                             "MRKProxyRegisterGUICallback");
-        _MRKProxySetColor = (__MRKProxySetColor) dlsym(mrk, "MRKProxySetColor");
-        _MRKProxyLabel = (__MRKProxyLabel) dlsym(mrk, "MRKProxyLabel");
-        _MRKProxyBox = (__MRKProxyBox) dlsym(mrk, "MRKProxyBox");
-        _MRKProxyLine = (__MRKProxyLine) dlsym(mrk, "MRKProxyLine");
-        _MRKProxyGetScreenInfo = (__MRKProxyGetScreenInfo) dlsym(mrk, "MRKProxyGetScreenInfo");
-        _MRKGUIGetMainDisplay = (__MRKGUIGetMainDisplay) dlsym(mrk, "MRKGUIGetMainDisplay");
+        *(void **) &MRKProxyProcessCommand = dlsym(mrk, "MRKProxyProcessCommand");
+
         return true;
     }
 
@@ -74,32 +67,36 @@ namespace MRK {
 
     namespace GUI {
         int MRKProxyRegisterGUICallback(MRKProxyGUICallback callback) {
-            return _MRKProxyRegisterGUICallback(callback);
+            int _id = -1;
+            MRKProxyProcessCommand(MRKProxyCommand::RegisterGUICallback, &_id, callback);
+
+            return _id;
         }
 
         void MRKProxySetColor(float r, float g, float b, float a) {
-            _MRKProxySetColor(r, g, b, a);
+            MRKProxyProcessCommand(MRKProxyCommand::SetColor, r, g, b, a);
         }
 
         void MRKProxyLabel(float x, float y, float w, float h, const char *txt, float fontsize) {
-            _MRKProxyLabel(x, y, w, h, txt, fontsize);
+            MRKProxyProcessCommand(MRKProxyCommand::Label, x, y, w, h, txt, fontsize);
         }
 
         void MRKProxyBox(float x, float y, float w, float h) {
-            _MRKProxyBox(x, y, w, h);
+            MRKProxyProcessCommand(MRKProxyCommand::Box, x, y, w, h);
         }
 
         void MRKProxyLine(float x1, float y1, float x2, float y2, float width) {
-            _MRKProxyLine(x1, y1, x2, y2, width);
+            MRKProxyProcessCommand(MRKProxyCommand::Line, x1, y1, x2, y2, width);
         }
 
         void MRKProxyGetScreenInfo(float *w, float *h, float *pr) {
-            _MRKProxyGetScreenInfo(w, h, pr);
+            MRKProxyProcessCommand(MRKProxyCommand::GetScreenInfo, w, h, pr);
         }
 
         //MGUI
         MRKGUIDisplay* ms_Display;
 
+        //DISPLAY
         MRKGUIWidget::MRKGUIWidget(MRK::GUI::MRKGUIWidget *parent, MRK::GUI::MRKAnchor anchor,
                                    MRK::Rect rect) : Parent(parent), Anchor(anchor), Rect(rect) {
         }
@@ -107,8 +104,24 @@ namespace MRK {
         MRKGUIDisplay::MRKGUIDisplay() : MRKGUIWidget(0, MRK_ANCHOR_NONE, Rect()) {
         }
 
-        MRKGUILabel *MRKGUIDisplay::RegisterWidget(MRKGUILabel *widget) {
+        MRKGUILabel *
+        MRKGUIDisplay::RegisterWidget(MRKAnchor anchor, Rect rect, const char *txt, float fontsize,
+                                      MRKGUIWidget *parent) {
+            if (!parent)
+                parent = this;
 
+            void *handle = 0;
+
+            MRKProxyProcessCommand(MRKProxyCommand::RegisterLabel, parent->Handle, anchor, rect,
+                                   txt, fontsize, &handle);
+
+            if (!handle)
+                return 0;
+
+            MRKGUILabel *label = new MRKGUILabel(parent, anchor, rect);
+            label->Handle = handle;
+
+            return label;
         }
 
         MRKGUIDisplay* MRKGUIGetMainDisplay() {
@@ -118,12 +131,28 @@ namespace MRK {
             void *handle = 0;
             int id = -1;
 
-            _MRKGUIGetMainDisplay(&handle, &id);
+            MRKProxyProcessCommand(MRKProxyCommand::GetMainDisplay, &handle, &id);
 
             ms_Display->Handle = handle;
             ms_Display->ID = id;
 
             return ms_Display;
+        }
+
+        //LABEL
+        const char *MRKGUILabel::GetText() {
+            char *chz = 0;
+            MRKProxyProcessCommand(MRKProxyCommand::LabelGetText, Handle, &chz);
+
+            return chz;
+        }
+
+        void MRKGUILabel::SetText(const char *text) {
+            MRKProxyProcessCommand(MRKProxyCommand::LabelSetText, Handle, text);
+        }
+
+        MRKGUILabel::MRKGUILabel(MRKGUIWidget *parent, MRKAnchor anchor, Rect rect) : MRKGUIWidget(
+                parent, anchor, rect) {
         }
     }
 }

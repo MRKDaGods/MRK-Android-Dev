@@ -11,14 +11,11 @@
 #include "../utils/MRKUtils.h"
 #include "../utils/DupSafeVector.hpp"
 
-namespace MRK
-{
-    namespace GUI
-    {
+namespace MRK {
+    namespace GUI {
         class MRKGuiBaseWidget;
 
-        enum MRKAnchor
-        {
+        enum MRKAnchor {
             MRK_ANCHOR_NONE = 0, //hack elements
             MRK_ANCHOR_TOP = 1,
             MRK_ANCHOR_MIDDLE = 2,
@@ -38,26 +35,23 @@ namespace MRK
             MRK_ANCHOR_BOTTOM_RIGHT = MRK_ANCHOR_BOTTOM | MRK_ANCHOR_RIGHT
         };
 
-        enum MRKWidgetInitFlags
-        {
+        enum MRKWidgetInitFlags {
             MRK_WIDGET_INIT_FLAG_NONE = 0,
             MRK_WIDGET_INIT_FLAG_NO_SIZE = 1,
             MRK_WIDGET_INIT_FLAG_NO_ANCHOR = 2
         };
 
-        struct WidgetInitOptions
-        {
+        struct WidgetInitOptions {
             MRKGuiBaseWidget *Parent;
             MRKAnchor Anchor;
             _MATH Rect Rect;
             MRKWidgetInitFlags Flags;
         };
 
-        class MRKGuiBaseWidget
-        {
+        class MRKGuiBaseWidget {
         protected:
             MRKGuiBaseWidget *m_Parent;
-            _UTILITY DupSafeVector<MRKGuiBaseWidget*> m_Children;
+            _UTILITY DupSafeVector<MRKGuiBaseWidget *> m_Children;
             bool m_Visible;
             bool m_Focused;
             bool m_Interactable;
@@ -72,32 +66,59 @@ namespace MRK
             MRKAnchor m_Anchor;
 
             void RecalculateAnchors();
+
             void RecalculateSize();
+
         public:
-            MRKGuiBaseWidget(MRKGuiBaseWidget *parent, MRKAnchor anchor, _MATH Rect rect, MRKWidgetInitFlags flags = MRK_WIDGET_INIT_FLAG_NONE);
+            MRKGuiBaseWidget(MRKGuiBaseWidget *parent, MRKAnchor anchor, _MATH Rect rect,
+                             MRKWidgetInitFlags flags = MRK_WIDGET_INIT_FLAG_NONE);
+
             ~MRKGuiBaseWidget();
+
             virtual void Draw(MRKUIcontext *context);
+
             virtual void SetTheme(MRKTheme *theme);
+
             virtual void ReInit(WidgetInitOptions options);
+
             bool Visible();
+
             void SetVisible(bool visible);
+
             _MATH Vector2 Position();
+
             _MATH Rect Rectangle();
+
             MRKTheme *Theme();
+
             virtual bool HandleTouchEvent(MRKTouchEvent &event);
+
             void UpdateFocusState(bool focused);
+
             void NotifyPositionChanged();
+
             void NotifyRectangleChanged();
+
             void NotifySizeChanged();
+
             bool Focused();
+
             void AddChild(MRKGuiBaseWidget *widget);
+
             MRKGuiBaseWidget *FindWidget(_MATH Vector2 pos);
+
             _MATH Rect ScreenRect();
+
             _MATH Vector2 S9Plus_FHDPLUS_Position();
+
             _MATH Vector2 S9Plus_FHDPLUS_Size();
+
             _MATH Rect S9Plus_FHDPLUS_Rect();
+
             void SetS9Plus_FHDPLUS_Size(_MATH Vector2 size);
+
             void SetS9Plus_FHDPLUS_Position(_MATH Vector2 pos);
+
             virtual int Id();
         };
     }

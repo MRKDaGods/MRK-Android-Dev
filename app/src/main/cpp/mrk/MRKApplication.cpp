@@ -161,4 +161,8 @@ namespace MRK {
         ms_GUICallbacks.push_back(callback);
         return ms_GUICallbacks.size() - 1;
     }
+
+    _GUI MRKDisplay *MRKApplication::GetUIDisplay() {
+        return ms_UiDisplay;
+    }
 }
