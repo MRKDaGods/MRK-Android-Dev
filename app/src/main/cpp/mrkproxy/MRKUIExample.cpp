@@ -22,7 +22,7 @@ void OnMRKGUI()
 {
     MRKProxySetColor(0.12549f, 0.12549f, 0.12549f, 1.f);
     MRKProxyBox(10.f, 10.f, 200.f, 100.f);
-
+    return;
     MRKProxySetColor(1.f, 1.f, 0.f, 1.f);
     MRKProxyLabel(15.f, 20.f, 90.f, 30.f, "MRKDaGods", 35.f);
 

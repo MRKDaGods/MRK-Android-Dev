@@ -6,9 +6,9 @@
 #include "../../MRKLog.h"
 #include "../MRKGuiComponent.h"
 
-extern int MRK_PIC;
-extern int SHANGO_PIC;
-extern int DT2MS_PIC;
+int MRK_PIC;
+int SHANGO_PIC;
+int DT2MS_PIC;
 
 #define MRK_BUILD_VERSION "MRK(UI API v2.2)(MONO API v0.5)(IL2CPP API v2) - DT2(MONO) v1.5b [BETA BUILD]"
 

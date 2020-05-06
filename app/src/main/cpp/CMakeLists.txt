@@ -75,7 +75,12 @@ add_library( # Sets the name of the library.
              mrk/components/MRKGuiComponentDebugger.cpp
              mrk/components/MRKGuiComponentLoader.cpp
 
-        mrk/components/DT2/MRKGuiComponentBaseDT2_REF.cpp
+             mrk/components/DT2/MRKGuiComponentBaseDT2_REF.cpp
+
+             mrk/mono/MRKMonoAPI.cpp
+             mrk/mono/MRKMonoCore.cpp
+
+             mrk/dynamic/MRKDynamic.cpp
 
              mrk/utils/MRKUtils.cpp
 
@@ -96,8 +101,9 @@ add_library(
 
         SHARED
 
+        mrkproxy/MRKDynamic.cpp
         mrkproxy/MRKProxyDynamic.cpp
-        mrkproxy/MRKUIExample2.cpp
+        mrkproxy/MRKUIExample.cpp
 )
 
 # Searches for a specified prebuilt library and stores the path as a

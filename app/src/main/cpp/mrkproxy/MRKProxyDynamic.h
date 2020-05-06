@@ -2,5 +2,7 @@
 
 namespace MRK
 {
-    extern bool MRKProxyInitialize(const char* pkg);
+    namespace Dynamic {
+        extern bool MRKProxyInitialize(const char *pkg);
+    }
 }

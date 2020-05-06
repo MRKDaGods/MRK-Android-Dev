@@ -1,4 +1,4 @@
-#include "LMSDynamic.h"
+#include "MRKDynamic.h"
 #include "../MRKLog.h"
 #include "../utils/MRKUtils.h"
 
@@ -18,7 +18,7 @@ namespace MRK
         void InitializeDynamic(_STD string pkg)
         {
             GPackageName = pkg;
-            LMSLog(LMS_LOGTYPE_INFO, "MRK-Dynamic",
+            MRKLog(MRK_LOGTYPE_INFO, "MRK-Dynamic",
                    _UTILITY concat("Dynamic Initialization [PKG='", pkg, "']"));
         }
 

@@ -8,7 +8,7 @@ namespace MRK
 {
     namespace Mono
     {
-        extern _STD string LMS_PACKAGE_NAME_MONO;
+        extern _STD string MRK_PACKAGE_NAME_MONO;
 
         typedef void *(*__mono_class_from_name)(void *, const char *,
                                                 const char *); //img, nms, name
@@ -49,7 +49,7 @@ namespace MRK
         extern __mono_assembly_foreach mono_assembly_foreach;
         extern __mono_image_get_name mono_image_get_name;
 
-        void LMS_INIT_API();
+        void MRK_INIT_API();
 
         extern void SendMessageF(unsigned short c, unsigned short h, unsigned short o, float v);
 

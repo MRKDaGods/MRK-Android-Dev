@@ -8,3 +8,5 @@
 #define _IL2CPP ::LMS::IL2CPP::
 #define _MONO ::MRK::Mono::
 #define _DYNAMIC ::MRK::Dynamic::
+
+#define MRK_EXPORT(TY) JNIEXPORT TY JNICALL

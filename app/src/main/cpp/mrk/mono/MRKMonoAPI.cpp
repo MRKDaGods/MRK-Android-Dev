@@ -1,7 +1,7 @@
 #include <dlfcn.h>
 
 #include "MRKMonoAPI.h"
-#include "../dynamic/LMSDynamic.h"
+#include "../dynamic/MRKDynamic.h"
 #include "../MRKLog.h"
 #include "../utils/MRKUtils.h"
 
@@ -40,18 +40,18 @@ namespace MRK
                 (void **) &mono_image_get_name
         };
 
-        void LMS_INIT_API()
+        void MRK_INIT_API()
         {
 #ifdef DT2_BUILD
             _DYNAMIC DynamicLibrary dynamicLibrary = _DYNAMIC LoadLibrary("libmono");
 #else
             void *handle = dlopen(
-                    ("/data/data/" + LMS_PACKAGE_NAME_MONO + "/lib/libmonobdwgc-2.0.so").c_str(),
+                    ("/data/data/" + MRK_PACKAGE_NAME_MONO + "/lib/libmonobdwgc-2.0.so").c_str(),
                     RTLD_LAZY);
 #endif
             if (!dynamicLibrary)
             {
-                LMSLog(LMS_LOGTYPE_ERROR, "MRK-Dynamic", "Could not load libmono");
+                MRKLog(MRK_LOGTYPE_ERROR, "MRK-Dynamic", "Could not load libmono");
                 return;
             }
             _DYNAMIC DynamicSearchQuery query = _DYNAMIC DynamicSearchQuery{
@@ -72,20 +72,20 @@ namespace MRK
                     }
             };
             _DYNAMIC DynamicSearchResult result = _DYNAMIC Search(dynamicLibrary, query);
-            LMSLog(LMS_LOGTYPE_INFO, "MRK-Dynamic",
+            MRKLog(MRK_LOGTYPE_INFO, "MRK-Dynamic",
                    _UTILITY concat("Dynamics Fully Initialized [Consistency=",
                                    result.SuccessRate, "%] [SuccessCount=", result.SuccessfulCount,
                                    "/", query.QuerySize, "]"));
             if (result.SuccessfulCount != query.QuerySize)
             {
-                LMSLog(LMS_LOGTYPE_WARNING, "MRK-Dynamic",
+                MRKLog(MRK_LOGTYPE_WARNING, "MRK-Dynamic",
                        "Improper consistency... Crashes might occur!");
             }
-            LMSLog(LMS_LOGTYPE_INFO, "MRK-Dynamic", "Functions:");
+            MRKLog(MRK_LOGTYPE_INFO, "MRK-Dynamic", "Functions:");
             for (size_t i = 0; i < result.FunctionCount; i++)
             {
                 _DYNAMIC DynamicFunction *dynamicFunction = &result.Functions[i];
-                LMSLog(LMS_LOGTYPE_INFO, "MRK-Dynamic",
+                MRKLog(MRK_LOGTYPE_INFO, "MRK-Dynamic",
                        _UTILITY concat("        ", dynamicFunction->Name, " [",
                                        (void *) dynamicFunction->Ptr, "]"));
                 *IndexPointerMapping[i] = (void*)dynamicFunction->Ptr;

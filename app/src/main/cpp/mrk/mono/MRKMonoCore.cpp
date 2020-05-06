@@ -1,7 +1,7 @@
 #include <android/log.h>
 #include "MRKMonoAPI.h"
 #include "../MRKLog.h"
-#include "../dynamic/LMSDynamic.h"
+#include "../dynamic/MRKDynamic.h"
 #include "../utils/MRKUtils.h"
 
 #define DT2_BUILD
@@ -10,8 +10,8 @@ namespace MRK
 {
     namespace Mono
     {
-        _STD string LMS_PACKAGE_NAME_MONO = "com.madfingergames.deadtrigger2";
-        //_STD string LMS_PACKAGE_NAME_MONO = "io.github.MRK";
+        _STD string MRK_PACKAGE_NAME_MONO = "com.madfingergames.deadtrigger2";
+        //_STD string MRK_PACKAGE_NAME_MONO = "io.github.MRK";
 
         void *NATIVE_PIPE_SENDMESSAGEF;
         void *NATIVE_PIPE_SENDMESSAGEI;
@@ -25,62 +25,62 @@ namespace MRK
         {
             void *img = mono_assembly_get_image(asmz);
             const char *name = mono_image_get_name(img);
-            LMSLog(LMS_LOGTYPE_INFO, LMS_SENDER_NATIVE,
+            MRKLog(MRK_LOGTYPE_INFO, MRK_SENDER_NATIVE,
                    _UTILITY concat("Discovered image [Name=", name, "] [Address=", img, "]"));
-            if (!strcmp(name, "LMSDT2"))
+            if (!strcmp(name, "MRKDT2"))
                 ASM_DT2 = img;
-            else if (!strcmp(name, "LMSReceiverServiceProvider"))
+            else if (!strcmp(name, "MRKReceiverServiceProvider"))
                 ASM_RECEIVER = img;
         }
 
-        void LMSCoreInit()
+        void MRKCoreInit()
         {
-            LMSLog(LMS_LOGTYPE_INFO, LMS_SENDER_NATIVE, "Initializing LMSCore [MONO]");
-            _DYNAMIC InitializeDynamic(LMS_PACKAGE_NAME_MONO);
-            LMS_INIT_API();
+            MRKLog(MRK_LOGTYPE_INFO, MRK_SENDER_NATIVE, "Initializing MRKCore [MONO]");
+            _DYNAMIC InitializeDynamic(MRK_PACKAGE_NAME_MONO);
+            MRK_INIT_API();
             void *domain;
             if (!mono_get_root_domain || !(domain = mono_get_root_domain()))
             {
-                LMSLog(LMS_LOGTYPE_ERROR, LMS_SENDER_NATIVE, "Could not fetch domain!");
+                MRKLog(MRK_LOGTYPE_ERROR, MRK_SENDER_NATIVE, "Could not fetch domain!");
                 return;
             }
             if (!mono_thread_attach)
             {
-                LMSLog(LMS_LOGTYPE_ERROR, LMS_SENDER_NATIVE, "Could not attach thread to mono!");
+                MRKLog(MRK_LOGTYPE_ERROR, MRK_SENDER_NATIVE, "Could not attach thread to mono!");
                 return;
             }
             mono_thread_attach(domain);
-            LMSLog(LMS_LOGTYPE_INFO, LMS_SENDER_NATIVE,
+            MRKLog(MRK_LOGTYPE_INFO, MRK_SENDER_NATIVE,
                    _UTILITY concat("Fetched domain [Address=", domain, "]"));
             if (!mono_assembly_foreach)
             {
-                LMSLog(LMS_LOGTYPE_ERROR, LMS_SENDER_NATIVE, "Could not fetch assemblies!");
+                MRKLog(MRK_LOGTYPE_ERROR, MRK_SENDER_NATIVE, "Could not fetch assemblies!");
                 return;
             }
             mono_assembly_foreach(AsmIterator, 0);
             if (!ASM_RECEIVER)
             {
-                LMSLog(LMS_LOGTYPE_ERROR, LMS_SENDER_NATIVE, "Could not fetch receiver");
+                MRKLog(MRK_LOGTYPE_ERROR, MRK_SENDER_NATIVE, "Could not fetch receiver");
                 return;
             }
             if (!mono_class_from_name)
             {
-                LMSLog(LMS_LOGTYPE_ERROR, LMS_SENDER_NATIVE, "Could not fetch classes!");
+                MRKLog(MRK_LOGTYPE_ERROR, MRK_SENDER_NATIVE, "Could not fetch classes!");
                 return;
             }
             void *nativepipe_class = mono_class_from_name(ASM_RECEIVER,
-                                                          "LMSReceiverServiceProvider",
+                                                          "MRKReceiverServiceProvider",
                                                           "NativePipe");
             if (!nativepipe_class)
             {
-                LMSLog(LMS_LOGTYPE_ERROR, LMS_SENDER_NATIVE, "Could not fetch proxy native pipe");
+                MRKLog(MRK_LOGTYPE_ERROR, MRK_SENDER_NATIVE, "Could not fetch proxy native pipe");
                 return;
             }
-            LMSLog(LMS_LOGTYPE_INFO, LMS_SENDER_NATIVE,
+            MRKLog(MRK_LOGTYPE_INFO, MRK_SENDER_NATIVE,
                    _UTILITY concat("Fetched proxy native pipe [Address=", nativepipe_class, "]"));
             if (!mono_class_get_method_from_name)
             {
-                LMSLog(LMS_LOGTYPE_ERROR, LMS_SENDER_NATIVE, "Could not fetch methods");
+                MRKLog(MRK_LOGTYPE_ERROR, MRK_SENDER_NATIVE, "Could not fetch methods");
                 return;
             }
             NATIVE_PIPE_SENDMESSAGEF = mono_class_get_method_from_name(nativepipe_class,
@@ -91,7 +91,7 @@ namespace MRK
                                                                        "SendMessageB", 4);
             NATIVE_PIPE_SENDMESSAGEPFPF = mono_class_get_method_from_name(nativepipe_class,
                                                                           "SendMessagePFPF", 5);
-            LMSLog(LMS_LOGTYPE_INFO, LMS_SENDER_NATIVE,
+            MRKLog(MRK_LOGTYPE_INFO, MRK_SENDER_NATIVE,
                    _UTILITY concat("Fetched proxy native pipe handlers [F=",
                                    NATIVE_PIPE_SENDMESSAGEF, "] [I=",
                                    NATIVE_PIPE_SENDMESSAGEI, "] [B=",
@@ -101,7 +101,7 @@ namespace MRK
             mono_runtime_invoke(
                     mono_class_get_method_from_name(
                             mono_class_from_name(ASM_DT2,
-                                                 "LMSDT2",
+                                                 "MRKDT2",
                                                  "HackManager"),
                             "NativeInit", 0), 0, 0, 0);
 #endif
@@ -111,7 +111,7 @@ namespace MRK
         {
             if (!NATIVE_PIPE_SENDMESSAGEF)
             {
-                LMSLog(LMS_LOGTYPE_WARNING, LMS_SENDER_NATIVE,
+                MRKLog(MRK_LOGTYPE_WARNING, MRK_SENDER_NATIVE,
                        _UTILITY concat("Pipe fault, [TYPE=F] [", c, ", ", h, ", ", o, ", ", v,
                                        "]"));
                 return;
@@ -124,7 +124,7 @@ namespace MRK
         {
             if (!NATIVE_PIPE_SENDMESSAGEI)
             {
-                LMSLog(LMS_LOGTYPE_WARNING, LMS_SENDER_NATIVE,
+                MRKLog(MRK_LOGTYPE_WARNING, MRK_SENDER_NATIVE,
                        _UTILITY concat("Pipe fault, [TYPE=I] [", c, ", ", h, ", ", o, ", ", v,
                                        "]"));
                 return;
@@ -137,7 +137,7 @@ namespace MRK
         {
             if (!NATIVE_PIPE_SENDMESSAGEB)
             {
-                LMSLog(LMS_LOGTYPE_WARNING, LMS_SENDER_NATIVE,
+                MRKLog(MRK_LOGTYPE_WARNING, MRK_SENDER_NATIVE,
                        _UTILITY concat("Pipe fault, [TYPE=B] [", c, ", ", h, ", ", o, ", ", v,
                                        "]"));
                 return;
@@ -151,7 +151,7 @@ namespace MRK
         {
             if (!NATIVE_PIPE_SENDMESSAGEPFPF)
             {
-                LMSLog(LMS_LOGTYPE_WARNING, LMS_SENDER_NATIVE,
+                MRKLog(MRK_LOGTYPE_WARNING, MRK_SENDER_NATIVE,
                        _UTILITY concat("Pipe fault, [TYPE=PFPF] [", c, ", ", h, ", ", o, ", ", pF1,
                                        ", ", pF2, "]"));
                 return;

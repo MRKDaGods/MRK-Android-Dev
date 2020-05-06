@@ -3,7 +3,7 @@
 #include <dlfcn.h>
 #include <string>
 
-#include "src/main/cpp/lms/LMSCommon.h"
+#include "../MRKCommon.h"
 
 namespace MRK
 {

@@ -47,6 +47,7 @@ namespace MRK {
             MRKGUIDisplay* Display;
             MRKGUIWidget* Parent;
             MRKAnchor Anchor;
+            Rect WRect;
 
             MRKGUIWidget(MRKGUIWidget* parent, MRKAnchor anchor, Rect rect);
         };
@@ -56,8 +57,8 @@ namespace MRK {
 
             MRKGUIDisplay();
 
-            MRKGUILabel *RegisterWidget(MRKAnchor anchor, Rect rect, const char *txt,
-                                        float fontsize = 0, MRKGUIWidget *parent = this);
+            MRKGUILabel *RegisterLabel(MRKAnchor anchor, Rect rect, const char *txt,
+                                       float fontsize = 0, MRKGUIWidget *parent = 0);
         };
 
         struct MRKGUILabel : public MRKGUIWidget {

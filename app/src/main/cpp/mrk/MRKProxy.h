@@ -2,6 +2,8 @@
 
 #include <jni.h>
 
+#include "MRKCommon.h"
+
 extern "C"
 {
     namespace MRK
@@ -29,7 +31,13 @@ extern "C"
 
             typedef void(*MRKProxyGUICallback)();
 
-            JNIEXPORT bool JNICALL MRKProxyProcessCommand(MRKProxyCommand command, ...);
+            typedef void (*GenericContextualPtr)(...);
+
+            MRK_EXPORT(GenericContextualPtr) MRKProxyProcessCommand(MRKProxyCommand command);
+
+            MRK_EXPORT(void) MRKProxyBox(float x, float y, float w, float h);
+
+            MRK_EXPORT(void) MRKProxySetColor(float r, float g, float b, float a);
         }
     }
 }
